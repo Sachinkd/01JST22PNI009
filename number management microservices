@@ -1,0 +1,36 @@
+from gettext import install
+
+pip install Flask
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+numbers = []  # A list to store the numbers
+
+
+@app.route('/numbers', methods=['GET'])
+def get_numbers():
+    return jsonify(numbers)
+
+
+@app.route('/numbers', methods=['POST'])
+def add_number():
+    data = request.get_json()
+    if 'number' in data and isinstance(data['number'], int):
+        numbers.append(data['number'])
+        return jsonify({'message': 'Number added successfully'}), 201
+    else:
+        return jsonify({'error': 'Invalid data. Please provide a valid number'}), 400
+
+
+@app.route('/numbers/average', methods=['GET'])
+def get_average():
+    if len(numbers) > 0:
+        average = sum(numbers) / len(numbers)
+        return jsonify({'average': average})
+    else:
+        return jsonify({'error': 'No numbers available'}), 404
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
